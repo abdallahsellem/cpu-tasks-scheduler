@@ -1,25 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import ChartScheduling from './components/ChartScheduling';
 
-function App() {
+const App = () => {
+  const processes = [
+    { pid: 1, arrivalTime: 0, burstTime: 5, color: 'blue' },
+    { pid: 2, arrivalTime: 2, burstTime: 3, color: 'orange' },
+    { pid: 3, arrivalTime: 4, burstTime: 2, color: 'green' },
+    { pid: 4, arrivalTime: 6, burstTime: 4, color: 'red' },
+    { pid: 1, arrivalTime: 9, burstTime: 10, color: 'blue' },
+  ];
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ textAlign: 'center' }}>
+      <h1>CPU Scheduler Visualization</h1>
+      <ChartScheduling processes={processes} />
     </div>
   );
-}
+};
 
 export default App;
