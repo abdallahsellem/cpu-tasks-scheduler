@@ -7,7 +7,10 @@ const App = () => {
     { pid: 2, arrivalTime: 2, burstTime: 3, color: 'orange' },
     { pid: 3, arrivalTime: 4, burstTime: 2, color: 'green' },
     { pid: 4, arrivalTime: 6, burstTime: 4, color: 'red' },
-    { pid: 1, arrivalTime: 9, burstTime: 10, color: 'blue' },
+    { pid: 1, arrivalTime: 7, burstTime: 3, color: 'blue' },
+    { pid: 1, arrivalTime: 12, burstTime: 3, color: 'blue' },
+    { pid: 1, arrivalTime: 17, burstTime: 8, color: 'blue' },
+
   ];
 
   return (
