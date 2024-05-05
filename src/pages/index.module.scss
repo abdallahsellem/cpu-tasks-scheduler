@@ -1,0 +1,40 @@
+#Page{
+    height: auto;   
+    background-color: #9b9b9b;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+
+    #InfoContainer{
+        padding-top: 50px;
+    }
+    #TasksContainer{
+        margin-top: 100px;
+        border:  solid 1px rgb(122, 85, 81);
+    }
+    #TasksContainer > div{
+        margin :30px
+    }
+    #maximumTimeContainer{
+        margin-top: 50px;
+    }
+}
+
+    // padding-top: 6%;
+    // height: 100vh;
+    // .pageContent{
+    //     width: 100%;
+    //     height: 50%;
+    //     color: white;
+    //     .startingButton{
+    //         width: 15%;
+    //         height: 10%;
+    //     }
+    //     .initialPosInput{
+    //         margin-top: 20px;
+    //         display: flex;
+    //         justify-content:center ;
+    //     }}

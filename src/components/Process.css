@@ -1,0 +1,14 @@
+.process {
+    animation: fadeIn 0.5s ease-out; /* Define animation */
+    opacity: 1; /* Initially set opacity to 0 */
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0; /* Start with opacity 0 */
+    }
+    100% {
+      opacity: 1; /* End with opacity 1 */
+    }
+  }
+  

@@ -1,7 +1,9 @@
 import React from 'react';
+import './Process.css'; // Import CSS file for styling and animation
 
-const Process = ({ pid, arrivalTime, burstTime, color }) => {
+const Process = ({ pid, arrivalTime, burstTime, color,parWidth }) => {
   const barWidth = 91; // Width of each time unit on the chart
+
   const style = {
     backgroundColor: color,
     borderRadius: '5px',
@@ -11,13 +13,13 @@ const Process = ({ pid, arrivalTime, burstTime, color }) => {
     lineHeight: '30px',
     position: 'absolute',
     textAlign: 'center',
-    width: `${burstTime * barWidth}px`, // Adjust width based on burst time
-    left: `${arrivalTime * barWidth}px`, // Adjust position based on arrival time
+    width: `${burstTime * parWidth}px`, // Adjust width based on burst time
+    left: `${arrivalTime * parWidth}px`, // Adjust position based on arrival time
     top: `${pid * 40}px`, // Adjust position based on process ID
   };
 
   return (
-    <div style={style}>
+    <div className="process" style={style}>
       P{pid}
     </div>
   );
