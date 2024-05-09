@@ -53,7 +53,7 @@ function FormPage() {
 
     const handleTasksOrder = () => {
         console.log(tasksData.data)
-        const orderedTasks=schedulePeriodicRMA(tasksData.data,tasksData.maxTime)  ;
+        const orderedTasks=schedulePeriodicRR(tasksData.data,tasksData.maxTime,.25)  ;
         console.log(orderedTasks)
         setTracks(orderedTasks);
         setMaxTime(tasksData.maxTime)

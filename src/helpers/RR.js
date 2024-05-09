@@ -20,16 +20,29 @@ function scheduleJobs(tasksData, timeQuantum, maxTime) {
     }
     allJobs.sort((a, b) => a.releaseTime - b.releaseTime);
     let scheduledJobs = [];
-    let z = 0;
     let currTime = 0;
+    let deadLineBroken=-1 ;
     while (currTime <= maxTime && allJobs.length > 0) {
         for (let i = 0; i < allJobs.length; i++) {
+            if(currTime>allJobs[i].deadLine)
+                {
+                    deadLineBroken=currTime ;
+                }
             if (allJobs[i].releaseTime <= currTime) {
                 jobsQueue.push(allJobs[i]);
                 allJobs.splice(i, 1);
-                i--; // Adjust index after splicing
+                // i--; // Adjust index after splicing
             }
+    
         }
+
+        console.log("*********************************************")
+        console.log(currTime)
+        for (const joby of jobsQueue){
+            console.log(joby)
+        }
+        console.log("*********************************************")
+
         let currJob = jobsQueue.shift();
         if (currJob === undefined) {
             currTime++;
@@ -38,8 +51,9 @@ function scheduleJobs(tasksData, timeQuantum, maxTime) {
         let jobExecution = Math.min(timeQuantum, currJob.executionTime);
         currJob.executionTime -= jobExecution;
        
-        currTime += jobExecution;
         scheduledJobs.push({ taskid: currJob.taskid, jobid: currJob.jobid, releaseTime: currTime, executionTime: jobExecution ,color:currJob.color});
+        currTime += jobExecution;
+
 
         for (let i = 0; i < allJobs.length; i++) {
             if (allJobs[i].releaseTime <= currTime) {
@@ -53,18 +67,20 @@ function scheduleJobs(tasksData, timeQuantum, maxTime) {
                 jobsQueue.push(currJob) ;
             }
     }
-    console.log(scheduledJobs)
+    // console.log(scheduledJobs,deadLineBroken)
+    return scheduledJobs;
 }
 
-export function schedulePeriodicRR() {
+export function schedulePeriodicRR(tasksData,maxTime,timeQuantum) {
 
-    let tasksData = [{ taskid: 1, releaseTime: 4, period: 6, executionTime: 2, deadLine: 10, priority: 1 }
-        , { taskid: 2, releaseTime: 4, period: 10, executionTime: 6, deadLine: 12, priority: 6 }
-        , { taskid: 3, releaseTime: 0, period: 7, executionTime: 8, deadLine: 20, priority: 2 }]
-
-        let timeQuantum=2 ;
-        let maxTime=30 ;
+   
     const scheduledJobs = scheduleJobs(tasksData, timeQuantum, maxTime);
     console.log(scheduledJobs)
     return scheduledJobs;
 }
+// let tasksData = [{ taskid: 1, releaseTime: 0, period: 6, executionTime: 2, deadLine: 6, priority: 1 }
+//     , { taskid: 2, releaseTime: 1, period: 8, executionTime: 2, deadLine: 8, priority: 6 }
+//     , { taskid: 3, releaseTime: 2, period: 15, executionTime: 4, deadLine: 15, priority: 2 }]
+
+//     let timeQuantum=.25 ;
+//     let maxTime=30 ;
