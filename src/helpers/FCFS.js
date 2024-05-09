@@ -5,39 +5,51 @@ export function FIFO(processes_data) {
   const colorScale = chroma.scale(['#00FF00', '#FF0000']).mode('lab').colors(processes_data.length);
   const processes = []
   for (let i = 0;  i < 100 ; i++) {
-    const arrivalTime = processes_data.map((process) => i - process.releaseTime)
-    const minimumArrivalTime = Math.max(...arrivalTime)
-    const minimumArrivalTimeIndex = arrivalTime.indexOf(minimumArrivalTime)
+    // const arrivalTime = processes_data.map((process) => i - process.releaseTime)
+    // const minimumArrivalTime = Math.max(...arrivalTime)
+    // const minimumArrivalTimeIndex = arrivalTime.indexOf(minimumArrivalTime)
+
+    const maximumArrivalProcess = processes_data.reduce((acc, process) => {
+      const arrivalTime = i - process.releaseTime;
+      if (arrivalTime > acc.maxArrivalTime) {
+          return { process, maxArrivalTime: arrivalTime };
+      }
+      return acc;
+  }, { process: null, maxArrivalTime: -Infinity });
+
+  const minimumArrivalTime = maximumArrivalProcess.maxArrivalTime
+  const executedProcess = maximumArrivalProcess.process 
+  
+
     if(minimumArrivalTime < 0) {
       continue ;
     }
 
 
-    if (processes_data[minimumArrivalTimeIndex].executionTime + i > processes_data[minimumArrivalTimeIndex].deadLine  ) {
+    if (executedProcess.executionTime + i > executedProcess.deadLine  ) {
       processes.push({
-        taskid : minimumArrivalTimeIndex + 1 ,
+        taskid : executedProcess.taskid ,
         arrivalTime : i ,
-        burstTime : Math.max( processes_data[minimumArrivalTimeIndex].deadLine - i + 1, 0 ) ,
-        color : colorScale[minimumArrivalTimeIndex]
+        burstTime : Math.max( executedProcess.deadLine - i + 1, 0 ) ,
+        color : colorScale[executedProcess.taskid]
       })
 
-      const processNumber = processes.filter(process => process.taskid === minimumArrivalTimeIndex + 1 ).length
-      const message = `deadLine exceeded from process T${minimumArrivalTimeIndex+1}${processNumber} at ${processes_data[minimumArrivalTimeIndex].deadLine + 1}`
-      // console.log(message)
+      const processNumber = processes.filter(process => process.taskid === executedProcess.taskid ).length
+      const message = `deadLine exceeded from process T${executedProcess.taskid}${processNumber} at ${executedProcess.deadLine}`
+      console.log(message)
 
-      // setErrorMessage(message)
 
-      return [processes ,  minimumArrivalTimeIndex , i]
+      return [processes ,  executedProcess.taskid , executedProcess.deadLine]
     }else {
       processes.push({
-        taskid : minimumArrivalTimeIndex + 1 ,
+        taskid : executedProcess.taskid ,
         arrivalTime : i ,
-        burstTime : processes_data[minimumArrivalTimeIndex].executionTime ,
-        color : colorScale[minimumArrivalTimeIndex]
+        burstTime : executedProcess.executionTime ,
+        color : colorScale[executedProcess.taskid]
       })
-      i += processes_data[minimumArrivalTimeIndex].executionTime - 1
-      processes_data[minimumArrivalTimeIndex].releaseTime += processes_data[minimumArrivalTimeIndex].period 
-      processes_data[minimumArrivalTimeIndex].deadLine += processes_data[minimumArrivalTimeIndex].period 
+      i += executedProcess.executionTime - 1
+      executedProcess.releaseTime += executedProcess.period 
+      executedProcess.deadLine += executedProcess.period 
     }
 
 
