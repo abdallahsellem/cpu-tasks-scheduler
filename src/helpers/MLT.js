@@ -1,4 +1,4 @@
-export function runMinimumLaxity(processes_data) {
+export function runMinimumLaxity(processes_data , max_time) {
     const processes = processes_data.map((process, index) => ({
         pid: process.taskid,
         releaseTime: process.releaseTime,
@@ -7,38 +7,36 @@ export function runMinimumLaxity(processes_data) {
         deadline: process.deadLine       
     }));
 
-    console.log(processes_data)
-    console.log(processes)
-
     
 
     let currentTime = 0;
     let scheduledProcesses = [];
     let exceededProcesses = [];
     let currentProcess = null;
+    const deadLines = []
 
     while (true) {
-        if(currentTime > 30) {
+        if(currentTime > max_time) {
             break
         }
 
         if(currentProcess?.executionTime === 0 ) { 
-            scheduledProcesses = scheduledProcesses.filter((process) => !(process.pid === currentProcess.pid && process.turn === currentProcess.turn))
+            scheduledProcesses = scheduledProcesses.filter((process) => !(process.pid === currentProcess.pid && process.jopid === currentProcess.jopid))
             currentProcess = null 
         }else if (currentProcess) {
-            scheduledProcesses = scheduledProcesses.map((process) => process.pid === currentProcess.pid && process.turn === currentProcess.turn ? currentProcess : process)
+            scheduledProcesses = scheduledProcesses.map((process) => process.pid === currentProcess.pid && process.jopid === currentProcess.jopid ? currentProcess : process)
 
         }
 
         processes.forEach((process) => {
             if( currentTime % (process.releaseTime  + process.periodicTime ) === 0 ) {
-                const turn  = currentTime / (process.releaseTime  + process.periodicTime )  + 1
+                const jopid   = currentTime / (process.releaseTime  + process.periodicTime )  + 1
                 if(!(currentTime === 0 && process.releaseTime !== 0) ) {
                     scheduledProcesses.push({
                             pid: process.pid,
-                            turn ,
-                            deadline : process.deadline * turn , 
-                            releaseTime : process.releaseTime + ((turn - 1 )* process.periodicTime )  , 
+                            jopid  ,
+                            deadline : process.deadline * jopid  , 
+                            releaseTime : process.releaseTime + ((jopid - 1 )* process.periodicTime )  , 
                             periodicTime : process.periodicTime ,
                             executionTime : process.executionTime
                           
@@ -51,12 +49,14 @@ export function runMinimumLaxity(processes_data) {
         // Calculate the laxity for each process
         scheduledProcesses.forEach(process => {
             let timeUntilDeadline = process.deadline - currentTime;
-            let remainingExecutionTime = process.executionTime + process.releaseTime;
+            let remainingExecutionTime = process.executionTime;
             let laxity = timeUntilDeadline - remainingExecutionTime;
 
             if (laxity >= 0) {
                 process.laxity = laxity;
                 process.color = '';
+            }else {
+                process.laxity = 10000
             }
         });
 
@@ -65,6 +65,8 @@ export function runMinimumLaxity(processes_data) {
         // Find the process with the minimum laxity
         let minLaxityProcess = scheduledProcesses.reduce((min, process) =>
             process.laxity < min.laxity ? process : min, scheduledProcesses[0]);
+
+
 
         let nextChange = processes.reduce((min, process) => {
             let time = Math.ceil((currentTime + 0.1)/ process.periodicTime) * process.periodicTime - currentTime + process.releaseTime
@@ -75,25 +77,31 @@ export function runMinimumLaxity(processes_data) {
         }, processes[0])
 
 
-
-
         
         // If all processes have laxity <= 0, break the loop
 
-        if (!minLaxityProcess ) {
+        if (scheduledProcesses.length === 0) {
             currentTime += nextChange.time
             continue
             
-        }else if (minLaxityProcess.laxity < 0) {
-            break ;
+        }else if (minLaxityProcess.laxity === 10000) {
+
+            deadLines.push({
+                jopid: minLaxityProcess.jopid , 
+                taskid : minLaxityProcess.taskid , 
+                time : currentTime
+            })
+        //    return [exceededProcesses , minLaxityProcess]
+        currentProcess = minLaxityProcess
         }
         else { 
             currentProcess = minLaxityProcess
         }
 
         const x = currentTime 
-
         currentTime += Math.min(nextChange.time , minLaxityProcess.executionTime)
+
+
         if (currentProcess) {
             exceededProcesses.push({
                 arrivalTime : x, 
@@ -105,6 +113,6 @@ export function runMinimumLaxity(processes_data) {
             currentProcess.executionTime -= Math.min(nextChange.time , currentProcess.executionTime)
         }
     }
-
-    return { processes: scheduledProcesses, exceededProcesses };
+    const [brokendeadline] = deadLines
+    return { processes : exceededProcesses , brokendeadline  };
 }

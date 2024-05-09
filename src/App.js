@@ -11,12 +11,13 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-const tasksData = [{ taskid: 3, releaseTime: 0, period: 12, executionTime: 3, deadLine: 12, priority: 2 }
-  , { taskid: 2, releaseTime: 0, period: 10, executionTime: 3, deadLine: 10, priority: 6 }  ,
-  { taskid: 1, releaseTime: 0, period: 4, executionTime: 1.5, deadLine: 4, priority: 1 }
+const tasksData =[
+  {taskid : 1 ,releaseTime: 0, period: 4, executionTime: 1.5, deadLine: 4 },
+  {taskid : 2 ,releaseTime: 0, period: 10, executionTime: 3, deadLine: 10 },
+  {taskid : 3 ,releaseTime: 0, period: 12, executionTime: 3, deadLine: 12 },
 ]
 
- const data =  runMinimumLaxity(tasksData)
+ const data =  runMinimumLaxity(tasksData , 28)
  console.log(data)
 const App = () => {
   return (
