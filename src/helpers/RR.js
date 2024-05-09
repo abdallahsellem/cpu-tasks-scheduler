@@ -20,7 +20,6 @@ function scheduleJobs(tasksData, timeQuantum, maxTime) {
     }
     allJobs.sort((a, b) => a.releaseTime - b.releaseTime);
     let scheduledJobs = [];
-    let z = 0;
     let currTime = 0;
     while (currTime <= maxTime && allJobs.length > 0) {
         for (let i = 0; i < allJobs.length; i++) {
@@ -53,18 +52,10 @@ function scheduleJobs(tasksData, timeQuantum, maxTime) {
                 jobsQueue.push(currJob) ;
             }
     }
-    console.log(scheduledJobs)
+    return scheduledJobs;
 }
 
-export function schedulePeriodicRR() {
-
-    let tasksData = [{ taskid: 1, releaseTime: 4, period: 6, executionTime: 2, deadLine: 10, priority: 1 }
-        , { taskid: 2, releaseTime: 4, period: 10, executionTime: 6, deadLine: 12, priority: 6 }
-        , { taskid: 3, releaseTime: 0, period: 7, executionTime: 8, deadLine: 20, priority: 2 }]
-
-        let timeQuantum=2 ;
-        let maxTime=30 ;
+export function schedulePeriodicRR(tasksData,timeQuantum,maxTime) {
     const scheduledJobs = scheduleJobs(tasksData, timeQuantum, maxTime);
-    console.log(scheduledJobs)
     return scheduledJobs;
 }

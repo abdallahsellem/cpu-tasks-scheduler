@@ -5,17 +5,24 @@ const MyContext = createContext({
   setTracks: () => [{}],
   maxTime: 0 ,// Add the maxTime field with initial value 0
   setMaxTime:()=>Number
+  ,
+  deadLine:{}
+  ,
+  setDeadLine:()=>{}
 });
 
 export const MyContextProvider = ({ children }) => {
   const [maxTime, setMaxTime] = useState(0);
   const [tasks, setTracks] = useState([{}]);
+  const [deadLine, setDeadLine] = useState({});
 
   const contextValue = {
     tasks,
     setTracks,
     maxTime,
-    setMaxTime
+    setMaxTime,
+    deadLine,
+    setDeadLine  
   };
 
   return (
