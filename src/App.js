@@ -1,35 +1,34 @@
-import React from 'react';
+import React,{useState} from 'react';
 import ChartScheduling from './components/ChartScheduling';
 import FormPage from "./pages/FormPage"
+import VisualizationPage from "./pages/VisualizationPage"
+import { MyContextProvider, useMyContext } from './context/TasksData';
+import { FIFO } from './helpers/FCFS'; // Adjust the path if necessary
+
 import {
   BrowserRouter,
   Link,
   Route,
   Routes,
 } from "react-router-dom";
+const tasksData = [{ taskid: 1, releaseTime: 4, period: 6, executionTime: 2, deadLine: 10, priority: 1 }
+  , { taskid: 2, releaseTime: 4, period: 10, executionTime: 6, deadLine: 12, priority: 6 }
+  , { taskid: 3, releaseTime: 0, period: 7, executionTime: 8, deadLine: 20, priority: 2 }]
 const App = () => {
-  const processes = [
-    { pid: 1, arrivalTime: 0, burstTime: 5, color: 'blue' },
-    { pid: 2, arrivalTime: 2, burstTime: 3, color: 'orange' },
-    { pid: 3, arrivalTime: 4, burstTime: 2, color: 'green' },
-    { pid: 4, arrivalTime: 6, burstTime: 4, color: 'red' },
-    { pid: 1, arrivalTime: 7, burstTime: 3, color: 'blue' },
-    { pid: 1, arrivalTime: 12, burstTime: 3, color: 'blue' },
-    { pid: 5, arrivalTime: 17, burstTime: 8, color: 'gray' },
-    { pid: 6, arrivalTime: 17, burstTime: 8, color: 'black' },
-    { pid: 7, arrivalTime: 17, burstTime: 8, color: '#735c33' },
-
-
-  ];
-
   return (
+    <MyContextProvider>
+      {console.log(FIFO(tasksData))}
     <div className="App">
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<FormPage></FormPage>} />
+        <Route path="/visualization-page" element={<VisualizationPage></VisualizationPage>} />
+
       </Routes>
     </BrowserRouter>
     </div>
+    </MyContextProvider>
+
   );
 };
 
