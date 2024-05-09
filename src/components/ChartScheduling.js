@@ -27,13 +27,14 @@ const ChartScheduling = ( ) => {
       <div className="processes-container" >
         {/* Processes */}
         {tasks.map((process) => (
-          <>            {console.log(process.taskid)}
+          <>            {console.log(process)}
           <Process
             key={process.taskid}
             pid={process.taskid}
             arrivalTime={process.arrivalTime}
             burstTime={process.burstTime}
             color={process.color}
+            jobid={process.jopid}
             parWidth={processParWidth}
           /></>
           

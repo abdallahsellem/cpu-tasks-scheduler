@@ -1,4 +1,10 @@
+
+import chroma from 'chroma-js'; // Import chroma-js for color manipulation
+
 export function runMinimumLaxity(processes_data , max_time) {
+
+    const colorScale = chroma.scale(['#00FF00', '#FF0000']).mode('lab').colors(processes_data.length);
+
     const processes = processes_data.map((process, index) => ({
         pid: process.taskid,
         releaseTime: process.releaseTime,
@@ -106,8 +112,8 @@ export function runMinimumLaxity(processes_data , max_time) {
             exceededProcesses.push({
                 arrivalTime : x, 
                 burstTime : Math.min(nextChange.time , currentProcess.executionTime) , 
-                pid : currentProcess.pid ,
-                ...currentProcess
+                taskid : currentProcess.pid ,
+                ...currentProcess,color:colorScale[currentProcess.pid]
                 
             })
             currentProcess.executionTime -= Math.min(nextChange.time , currentProcess.executionTime)

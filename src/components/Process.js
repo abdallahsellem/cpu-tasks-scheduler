@@ -1,7 +1,7 @@
 import React from 'react';
 import './Process.css'; // Import CSS file for styling and animation
 
-const Process = ({ pid, arrivalTime, burstTime, color,parWidth }) => {
+const Process = ({ pid, arrivalTime, burstTime, color,parWidth,jobid }) => {
   const barWidth = 91; // Width of each time unit on the chart
 
   const style = {
@@ -20,7 +20,7 @@ const Process = ({ pid, arrivalTime, burstTime, color,parWidth }) => {
 
   return (
     <div className="process" style={style}>
-      P{pid}
+      P{pid+1}{jobid}
     </div>
   );
 };

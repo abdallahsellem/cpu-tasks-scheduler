@@ -11,6 +11,9 @@ import { useNavigate } from "react-router-dom";
 import { schedulePeriodicFCFS } from '../helpers/FCFS'; // Adjust the path if necessary
 import { schedulePeriodicRMA } from '../helpers/rma'; // Adjust the path if necessary
 import { schedulePeriodicRR } from '../helpers/RR'; // Adjust the path if necessary
+import { runMinimumLaxity } from '../helpers/MLT'; // Adjust the path if necessary
+import { FIFO } from '../helpers/FCFS'; // Adjust the path if necessary
+
 
 function FormPage() {
     const { setMaxTime, setTracks } = useMyContext();
@@ -53,9 +56,9 @@ function FormPage() {
 
     const handleTasksOrder = () => {
         console.log(tasksData.data)
-        const orderedTasks=schedulePeriodicRMA(tasksData.data,tasksData.maxTime)  ;
+        const orderedTasks=FIFO(tasksData.data,tasksData.maxTime)  ;
         console.log(orderedTasks)
-        setTracks(orderedTasks);
+        setTracks(orderedTasks.processes);
         setMaxTime(tasksData.maxTime)
         navigate("/visualization-page")
         

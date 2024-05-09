@@ -48,10 +48,12 @@ export function FIFO(processes_data , max_time) {
 
       // return [processes ,  executedProcess.taskid , processNumber, executedProcess.deadLine]
     // }else {
+      const processNumber = processes.filter(process => process.taskid === executedProcess.taskid ).length
       processes.push({
         taskid : executedProcess.taskid ,
         arrivalTime : i ,
         burstTime : executedProcess.executionTime ,
+        jopid:processNumber,
         color : colorScale[executedProcess.taskid]
       })
       i += executedProcess.executionTime - 1
