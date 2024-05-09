@@ -17,8 +17,8 @@ const tasksData =[
   {taskid : 3 ,releaseTime: 0, period: 12, executionTime: 3, deadLine: 12 },
 ]
 
- const data =  runMinimumLaxity(tasksData , 28)
- console.log(data)
+//  const data =  runMinimumLaxity(tasksData , 28)
+//  console.log(data)
 const App = () => {
   return (
     <MyContextProvider>

@@ -48,7 +48,7 @@ export function FIFO(processes_data , max_time) {
 
       // return [processes ,  executedProcess.taskid , processNumber, executedProcess.deadLine]
     // }else {
-      const processNumber = processes.filter(process => process.taskid === executedProcess.taskid ).length
+      const processNumber = processes.filter(process => process.taskid === executedProcess.taskid ).length + 1
       processes.push({
         taskid : executedProcess.taskid ,
         arrivalTime : i ,
