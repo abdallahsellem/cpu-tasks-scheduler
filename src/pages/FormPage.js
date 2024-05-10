@@ -56,13 +56,18 @@ function FormPage() {
     };
 
     const handleTasksOrder = () => {
+        if(algorithmType==="")
+            {
+                return  ;
+            }
         console.log(tasksData.data)
         let orderedTasks=[];
         if (algorithmType === "FCFS") {
             orderedTasks=FIFO(tasksData.data,tasksData.maxTime)
         }
         else if (algorithmType === "RR") {
-            orderedTasks= schedulePeriodicRR(tasksData,tasksData.maxTime)
+            console.log("abdallaj")
+            orderedTasks= schedulePeriodicRR(tasksData.data,tasksData.maxTime,.25)
         }
         else if (algorithmType === "MLT") {
             orderedTasks=runMinimumLaxity(tasksData.data,tasksData.maxTime)
@@ -71,7 +76,7 @@ function FormPage() {
 
         }
         else if (algorithmType === "RMA") {
-
+            
         }
         else if (algorithmType === "EDF") {
             orderedTasks=schedulePeriodicEDF(tasksData.data,tasksData.maxTime);

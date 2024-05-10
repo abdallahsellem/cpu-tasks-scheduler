@@ -12,10 +12,13 @@ function scheduleJobs(tasksData, maxTime) {
     let scheduledJobs = []
 
     let taskIndex = 0;
+    console.log(maxTime)
+    //Generate all Jobs for all Tasks and sort them based on release time :
     for (const task of tasksData) {
         let currTime = 0;
         let currDeadLine = task.period;
         let jobsCounter = 1;
+        console.log(task)
         while (currTime <= maxTime) {
             console.log(currTime)
 
@@ -31,40 +34,60 @@ function scheduleJobs(tasksData, maxTime) {
     let currTime = 0;
     let currJob = {};
     let brokenDeadLine = {}
-    let jobsWithSamePriority = []
+    // 5 8 1 10
+    // 5 8 2 10 
     while (currTime < maxTime && allJobs.length > 0) {
         console.log(currTime, allJobs.length)
         let minimum_deadline = 10000000;
         let minimum_deadline_job = {};
+        let jobsWithSamePriority = []
 
+        //Get the Least deadline job between all jobs  ;
         for (const job of allJobs) {
             if (job.deadLine < minimum_deadline && job.releaseTime <= currTime) {
                 minimum_deadline = job.deadLine;
                 minimum_deadline_job = job;
             }
 
-            if (job.deadLine < currTime) {
+            if (job.deadLine < currTime&&Object.keys(brokenDeadLine).length === 0) {
                 brokenDeadLine = { taskid: job.taskid, jopid: job.jobid, time: currTime }
             }
         }
+        console.log("leeeeeeh",jobsWithSamePriority)
+        //check if there are many jobs with the same priority at current Time 
         for (const job of allJobs) {
             if (job.deadLine == minimum_deadline && job.releaseTime <= currTime) {
-                jobsWithSamePriority.push(job);
+                jobsWithSamePriority.push({...job});
             }
         }
+        //Corner Case when there are no tasks ready (all jobs left has release time greater that currTime) so lets jump to the CurrTime of the first Job left
         if (minimum_deadline === 10000000 && allJobs.length > 0) {
             currTime = allJobs[0].releaseTime;
             continue
         }
+        console.log("Mish Leeeeeeeh ",jobsWithSamePriority)
+        //Lets apply Round Robin on all jobs with the same priority and erase them from the Queue  ;
         if (jobsWithSamePriority.length > 1) {
             let maxTimeTemp = jobsWithSamePriority[0].deadLine;
-            let tempData = schedulePeriodicRR(jobsWithSamePriority, .25, jobsWithSamePriority[0].deadLine);
+            for (const job of jobsWithSamePriority) {
+              job.releaseTime=currTime  
+            }
+            console.log(currTime)
+            let tempData = schedulePeriodicRR(jobsWithSamePriority,jobsWithSamePriority[0].deadLine, .25);
 
             for (const job of jobsWithSamePriority) {
                 const findIndex = allJobs.findIndex(a => a === job)
                 findIndex !== -1 && allJobs.splice(findIndex, 1)
             }
-            scheduledJobs = scheduledJobs.concat(tempData)
+            console.log("djjjjjjjjjjjjjjjjjjjjjjjjjjjjj",tempData)
+            scheduledJobs = scheduledJobs.concat(tempData.processes)
+            if(Object.keys(tempData.brokendeadline).length !== 0)
+                {
+                        if(Object.keys(brokenDeadLine).length === 0)
+                            {
+                                brokenDeadLine=tempData.brokendeadline
+                            }
+                }
             currTime = maxTimeTemp;
             continue;
         }

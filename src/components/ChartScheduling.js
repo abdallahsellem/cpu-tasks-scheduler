@@ -15,6 +15,7 @@ const ChartScheduling = ( ) => {
   }, [processContainerRef]);
   return (
 <div className="scheduler-container">
+  <>{console.log(tasks,maxTime)}</>
       <div className="timeline-container">
         {[...Array(maxTime + 1).keys()].map((time) => (
           <div key={time} className="timeline" ref={processContainerRef}>
@@ -29,8 +30,8 @@ const ChartScheduling = ( ) => {
           <Process
             key={process.taskid}
             pid={process.taskid}
-            releaseTime={process.releaseTime}
-            executionTime={process.executionTime}
+            arrivalTime={process.arrivalTime}
+            burstTime={process.burstTime}
             color={process.color}
             jobid={process.jopid}
             parWidth={processParWidth}

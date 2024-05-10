@@ -3,7 +3,6 @@ import ChartScheduling from './components/ChartScheduling';
 import FormPage from "./pages/FormPage"
 import VisualizationPage from "./pages/VisualizationPage"
 import { MyContextProvider, useMyContext } from './context/TasksData';
-import { rateMonotonicSchedulingRma } from './helpers/rma'; // Adjust the path if necessary
 
 import {
   BrowserRouter,

@@ -10,7 +10,7 @@ function VisualizationPage() {
     <div>{console.log(Context)}<ChartScheduling  ></ChartScheduling>
         {
           Object.keys(Context.deadLine).length===0?<></>:
-         <div>task {Context.deadLine.taskid+1},{Context.deadLine.jopid+1} break deadline at : {Context.deadLine.time}  </div>
+         <div style={{display:'flex',justifyContent:"center",border:"solid 2px "}}><h4>JOB {Context.deadLine.taskid+1},{Context.deadLine.jopid+1} break deadline at : {Context.deadLine.time} </h4> </div>
         }
     </div>
   )
