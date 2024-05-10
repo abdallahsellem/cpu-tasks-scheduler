@@ -1,14 +1,8 @@
-import chroma from 'chroma-js'; // Import chroma-js for color manipulation
-
-
-export function RMA(processesData , maxTime) {
-    const colorScale = chroma.scale(['#00FF00', '#FF0000']).mode('lab').colors(processesData.length);
-
-    console.log(processesData , maxTime)
+function RMA(processesData , maxTime) {
     const processes = processesData.map((process, index) => ({
         pid: process.taskid,
         releaseTime: process.releaseTime,
-        periodicTime: process.period,
+        periodicTime: process.periodicTime,
         executionTime: process.executionTime,
         deadline: process.deadLine       
     }));
@@ -21,14 +15,6 @@ export function RMA(processesData , maxTime) {
     let deadLines = []
 
     while(true) {
-        console.log(currentTime)
-        if(x === currentTime ) {
-            break
-        }
-
-        if (currentTime > maxTime) {
-            break ;
-        }
 
         if(currentProcess?.releaseTime + processes?.executionTime > processes.deadLine){
             deadLines.push({
@@ -40,7 +26,10 @@ export function RMA(processesData , maxTime) {
 
 
 
-        
+        if (currentTime > maxTime) {
+            break ;
+        }
+
         if(currentProcess?.executionTime === 0 ) { 
             scheduledProcesses = scheduledProcesses.filter((process) => !(process.pid === currentProcess.pid && process.jobid === currentProcess.jobid))
             currentProcess = null 
@@ -115,9 +104,8 @@ export function RMA(processesData , maxTime) {
             exceededProcesses.push({
                 arrivalTime : x, 
                 burstTime :nextStep , 
-                taskid : currentProcess.pid ,
-                ...currentProcess ,
-                color:colorScale[currentProcess.pid]
+                pid : currentProcess.pid ,
+                ...currentProcess
                 
             })
             currentProcess.executionTime -= nextStep
@@ -129,3 +117,12 @@ export function RMA(processesData , maxTime) {
     return { processes: exceededProcesses , brokendeadline };
 
 }
+
+const processes = [
+    {taskid : 3 , releaseTime : 0 , periodicTime : 48 , executionTime : 4 , deadLine : 48},
+    {taskid : 2 , releaseTime : 0 , periodicTime : 36 , executionTime : 12 , deadLine : 36},
+    {taskid : 1 , releaseTime : 0 , periodicTime : 24 , executionTime : 7 , deadLine : 24},
+]
+
+const data = RMA(processes , 70)
+console.log(data)

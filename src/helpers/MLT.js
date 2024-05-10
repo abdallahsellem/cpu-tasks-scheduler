@@ -27,22 +27,22 @@ export function runMinimumLaxity(processes_data , max_time) {
         }
 
         if(currentProcess?.executionTime === 0 ) { 
-            scheduledProcesses = scheduledProcesses.filter((process) => !(process.pid === currentProcess.pid && process.jopid === currentProcess.jopid))
+            scheduledProcesses = scheduledProcesses.filter((process) => !(process.pid === currentProcess.pid && process.jobid === currentProcess.jobid))
             currentProcess = null 
         }else if (currentProcess) {
-            scheduledProcesses = scheduledProcesses.map((process) => process.pid === currentProcess.pid && process.jopid === currentProcess.jopid ? currentProcess : process)
+            scheduledProcesses = scheduledProcesses.map((process) => process.pid === currentProcess.pid && process.jobid === currentProcess.jobid ? currentProcess : process)
 
         }
 
         processes.forEach((process) => {
             if( currentTime % (process.releaseTime  + process.periodicTime ) === 0 ) {
-                const jopid   = currentTime / (process.releaseTime  + process.periodicTime )  + 1
+                const jobid   = currentTime / (process.releaseTime  + process.periodicTime )  + 1
                 if(!(currentTime === 0 && process.releaseTime !== 0) ) {
                     scheduledProcesses.push({
                             pid: process.pid,
-                            jopid  ,
-                            deadline : process.deadline * jopid  , 
-                            releaseTime : process.releaseTime + ((jopid - 1 )* process.periodicTime )  , 
+                            jobid  ,
+                            deadline : process.deadline * jobid  , 
+                            releaseTime : process.releaseTime + ((jobid - 1 )* process.periodicTime )  , 
                             periodicTime : process.periodicTime ,
                             executionTime : process.executionTime
                           
@@ -93,7 +93,7 @@ export function runMinimumLaxity(processes_data , max_time) {
         }else if (minLaxityProcess.laxity === 10000) {
 
             deadLines.push({
-                jopid: minLaxityProcess.jopid , 
+                jobid: minLaxityProcess.jobid , 
                 taskid : minLaxityProcess.taskid , 
                 time : currentTime
             })
@@ -113,7 +113,8 @@ export function runMinimumLaxity(processes_data , max_time) {
                 arrivalTime : x, 
                 burstTime : Math.min(nextChange.time , currentProcess.executionTime) , 
                 taskid : currentProcess.pid ,
-                ...currentProcess,color:colorScale[currentProcess.pid]
+                ...currentProcess,
+                color:colorScale[currentProcess.pid]
                 
             })
             currentProcess.executionTime -= Math.min(nextChange.time , currentProcess.executionTime)

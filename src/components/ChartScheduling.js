@@ -34,7 +34,7 @@ const ChartScheduling = ( ) => {
             arrivalTime={process.arrivalTime}
             burstTime={process.burstTime}
             color={process.color}
-            jobid={process.jopid}
+            jobid={process.jobid}
             parWidth={processParWidth}
           /></>
           

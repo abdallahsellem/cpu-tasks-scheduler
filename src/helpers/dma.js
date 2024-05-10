@@ -1,128 +1,135 @@
-import Task from "./task.js";
+import chroma from 'chroma-js'; // Import chroma-js for color manipulation
 
-class DeadlineMonotonicAssignment {
-    constructor(tasks, maxTime) {
-        this.tasks = tasks;
-        this.maxTime = maxTime;
-        this.currentTime = 0;
-        this.setPrioritiesBasedOnDeadLine();
-        this.executeList = [];
-        while (this.currentTime < this.maxTime) {
-            let task = this.getHighestPriorityTask();
-            this.run(task);
+
+export function DMA(processesData , maxTime) {
+    const colorScale = chroma.scale(['#00FF00', '#FF0000']).mode('lab').colors(processesData.length);
+    console.log("pro" , processesData)
+
+    const processes = processesData.map((process, index) => ({
+        pid: process.taskid,
+        releaseTime: process.releaseTime,
+        periodicTime: process.period,
+        executionTime: process.executionTime,
+        deadline: process.deadLine       
+    }));
+    console.log("processes" , processes)
+
+    let currentTime = 0;
+    let scheduledProcesses = [];
+    let exceededProcesses = [];
+    let currentProcess = null;
+    let x = -1 ; 
+    let deadLines = []
+
+    while(true) {
+        if(x === currentTime ) {
+            break
         }
-    }
+        if (currentTime > maxTime) {
+            break ;
+        }
 
-    setPrioritiesBasedOnDeadLine() {
-        let tasksDeadlines = this.tasks.map(task => task.deadline);
-        let count = 1;
-        let tasksPriorities = [];
-        for (let deadline1 of tasksDeadlines) {
-            for (let deadline2 of tasksDeadlines) {
-                if (deadline1 > deadline2) {
-                    count += 1;
+        if(currentProcess?.releaseTime + processes?.executionTime > processes.deadLine){
+            deadLines.push({
+                jobid: currentProcess.jobid , 
+                taskid : currentProcess.taskid , 
+                time : currentTime
+            })
+        }
+
+
+
+       
+
+        if(currentProcess?.executionTime === 0 ) { 
+            scheduledProcesses = scheduledProcesses.filter((process) => !(process.pid === currentProcess.pid && process.jobid === currentProcess.jobid))
+            currentProcess = null 
+        }else if (currentProcess) {
+            scheduledProcesses = scheduledProcesses.map((process) => process.pid === currentProcess.pid && process.jobid === currentProcess.jobid ? currentProcess : process)
+
+        }
+        
+
+        processes.forEach((process) => {
+
+            for(let currentTimeIndex = x + 1 ; currentTimeIndex <= currentTime ; currentTimeIndex++) {
+
+            if( currentTimeIndex % (process.releaseTime  + process.periodicTime ) === 0 ||  currentTimeIndex  == process.releaseTime   ) {
+                const jobid  = Math.floor(currentTimeIndex / (process.releaseTime  + process.periodicTime ))  + 1
+                if(!(currentTimeIndex === 0 && process.releaseTime !== 0) ) {
+                    scheduledProcesses.push({
+                            pid: process.pid,
+                            jobid ,
+                            deadline : process.deadline * jobid , 
+                            releaseTime : process.releaseTime + ((jobid - 1 )* process.periodicTime )  , 
+                            periodicTime : process.periodicTime ,
+                            executionTime : process.executionTime
+                          
+                        })
                 }
             }
-            tasksPriorities.push(count);
-            count = 1;
         }
-        for (let [index, task] of this.tasks.entries()) {
-            task.priority = tasksPriorities[index];
-        }
-    }
 
-    getHighestPriorityTask() {
-        if (this.executeList.length === 0) {
-            let tasksReadyTime = this.tasks.map(task => [task, task.readyTimes[0]]);
-            for (let [task, readyTime] of tasksReadyTime) {
-                if (readyTime <= this.currentTime) {
-                    task.remainingExecution = task.executionTime;
-                    this.executeList.push(task);
-                    task.readyTimes.shift();
-                }
+        })
+
+
+        let earlierDeadLineProcess = scheduledProcesses.reduce((min, process) =>
+            process.deadline < min.deadline ? process : min, scheduledProcesses[0]);
+
+
+        let nextChange = processes.reduce((min, process) => {
+            const numPeriod = Math.ceil((currentTime + 0.1)/ process.periodicTime) 
+            let time = numPeriod * process.periodicTime - currentTime + process.releaseTime
+            if(process.releaseTime + (numPeriod - 1) * process.periodicTime  < time && currentTime < process.releaseTime + (numPeriod - 1) * process.periodicTime ) {
+                time = process.releaseTime + (numPeriod - 1) * process.periodicTime 
             }
-            if (this.executeList.length === 0) {
-                this.currentTime = Math.min(...tasksReadyTime.map(([_, readyTime]) => readyTime));
-                this.updateTasksRemainingExecution();
-                return this.getHighestPriorityTask();
+
+            const minNumPeriod = Math.ceil((currentTime + 0.1)/ min.periodicTime) 
+            let minTime = minNumPeriod * min.periodicTime - currentTime + min.releaseTime
+            if(min.releaseTime + (numPeriod - 1) * min.periodicTime  < minTime && currentTime < min.releaseTime + (numPeriod - 1) * min.periodicTime ) {
+                minTime = min.releaseTime + (numPeriod - 1) * min.periodicTime 
             }
-        }
-        let priorities = this.executeList.map(task => task.priority);
-        let highestPriorityIndex = priorities.indexOf(Math.min(...priorities));
-        return this.executeList[highestPriorityIndex];
-    }
+            min.time = minTime
+            process.time = time 
+             return  process.time <  min.time ? process : min
+        }, processes[0])
 
-    updateTasksRemainingExecution() {
-        for (let task of this.tasks) {
-            if (task.readyTimes[0] <= this.currentTime) {
-                if (task.remainingExecution === 0 || task.deadlineBroken) {
-                    this.executeList.push(task);
-                    task.remainingExecution = task.executionTime;
-                    task.readyTimes.shift();
-                }
-                task.updateDeadline(this.currentTime);
-            }
+
+        if (!earlierDeadLineProcess ) {
+            currentTime += nextChange.time
+            continue
+            
+        }else { 
+            currentProcess = earlierDeadLineProcess
+        }
+
+        x = currentTime 
+        const nextStep =  Math.min((nextChange.deadline < currentProcess.deadline ? nextChange.time : earlierDeadLineProcess.executionTime ) , earlierDeadLineProcess.executionTime )
+       
+        currentTime += nextStep
+
+
+
+
+        if (currentProcess) {
+            exceededProcesses.push({
+                arrivalTime : x, 
+                burstTime :nextStep , 
+                taskid : currentProcess.pid ,
+                ...currentProcess,
+                color:colorScale[currentProcess.pid]
+                
+            })
+            currentProcess.executionTime -= nextStep
         }
     }
+    const [brokendeadline] = deadLines
 
-    getExecutionTimeToStopTask(task) {
-        let tasksReadyTime = this.tasks.map(t => t.readyTimes[0]);
-        let nearestReadyTime = Math.min(...tasksReadyTime);
-        if (this.currentTime + task.remainingExecution < nearestReadyTime) {
-            return this.currentTime + task.remainingExecution;
-        } else {
-            return nearestReadyTime;
-        }
-    }
+    console.log("processes end" , exceededProcesses)
 
-    run(task) {
-        let startTime = this.currentTime;
-        let endTime = this.getExecutionTimeToStopTask(task);
-        task.remainingExecution -= (endTime - startTime);
-        if (endTime > this.maxTime) {
-            task.executionTimes.push([startTime, this.maxTime]);
-        } else {
-            task.executionTimes.push([startTime, endTime]);
-        }
-        if (task.remainingExecution === 0) {
-            this.executeList.splice(this.executeList.indexOf(task), 1);
-        }
-        // Check if the task missed its deadline
-        for (let task of this.tasks) {
-            if (task.remainingExecution !== 0 && task.deadline <= endTime) {
-                if (!task.brokenDeadlines.includes(task.deadline)) {
-                    task.brokenDeadlines.push(task.deadline);
-                    task.deadlineBroken = true;
-                }
-            } else {
-                task.deadlineBroken = false;
-            }
-        }
-        this.currentTime = endTime;
-        this.updateTasksRemainingExecution();
-    }
 
-    getResults() {
-        let results = [];
-        this.tasks.forEach(task => {
-            task.executionTimes.forEach(([startTime, endTime]) => {
-                results.push({
-                    taskId: task.taskName,
-                    startTime: startTime,
-                    endTime: endTime
-                });
-            });
-        });
-        return results;
-    }
-}    
-let maxTime = 100;
-let tasks = [
-    new Task("Task1", 0, 60, 25, 50, maxTime),   
-    new Task("Task2", 15, 60, 10, 40, maxTime),  
-    new Task("Task3", 20, 60, 15, 60, maxTime)   
-];
-let deadlineMonotonicAssignment = new DeadlineMonotonicAssignment(tasks, maxTime);
 
-let results = deadlineMonotonicAssignment.getResults();
-console.log(results);
+    return { processes: exceededProcesses , brokendeadline };
+
+
+}

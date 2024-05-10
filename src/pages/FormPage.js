@@ -8,11 +8,14 @@ import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import {useMyContext} from "../context/TasksData"
 import { useNavigate } from "react-router-dom";
-import { schedulePeriodicFCFS } from '../helpers/FCFS'; // Adjust the path if necessary
-import { schedulePeriodicRMA } from '../helpers/rma'; // Adjust the path if necessary
-import { schedulePeriodicRR } from '../helpers/RR'; // Adjust the path if necessary
-import { runMinimumLaxity } from '../helpers/MLT'; // Adjust the path if necessary
+// import { schedulePeriodicFCFS } from '../helpers/FCFS'; // Adjust the path if necessary
+// import { schedulePeriodicRMA } from '../helpers/rma'; // Adjust the path if necessary
+// import { schedulePeriodicRR } from '../helpers/RR'; // Adjust the path if necessary
+// import { runMinimumLaxity } from '../helpers/MLT'; // Adjust the path if necessary
 import { FIFO } from '../helpers/FCFS'; // Adjust the path if necessary
+import { RMA } from '../helpers/rma'; 
+import { DMA } from '../helpers/dma'; 
+import { runMinimumLaxity } from '../helpers/MLT';
 
 
 function FormPage() {
@@ -56,7 +59,7 @@ function FormPage() {
 
     const handleTasksOrder = () => {
         console.log(tasksData.data)
-        const orderedTasks=FIFO(tasksData.data,tasksData.maxTime)  ;
+        const orderedTasks=runMinimumLaxity(tasksData.data,tasksData.maxTime)  ;
         console.log(orderedTasks)
         setTracks(orderedTasks.processes);
         setMaxTime(tasksData.maxTime)

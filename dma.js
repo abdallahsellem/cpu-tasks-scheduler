@@ -1,14 +1,10 @@
-import chroma from 'chroma-js'; // Import chroma-js for color manipulation
 
 
-export function RMA(processesData , maxTime) {
-    const colorScale = chroma.scale(['#00FF00', '#FF0000']).mode('lab').colors(processesData.length);
-
-    console.log(processesData , maxTime)
+function DMA(processesData , maxTime) {
     const processes = processesData.map((process, index) => ({
         pid: process.taskid,
         releaseTime: process.releaseTime,
-        periodicTime: process.period,
+        periodicTime: process.periodicTime,
         executionTime: process.executionTime,
         deadline: process.deadLine       
     }));
@@ -21,14 +17,6 @@ export function RMA(processesData , maxTime) {
     let deadLines = []
 
     while(true) {
-        console.log(currentTime)
-        if(x === currentTime ) {
-            break
-        }
-
-        if (currentTime > maxTime) {
-            break ;
-        }
 
         if(currentProcess?.releaseTime + processes?.executionTime > processes.deadLine){
             deadLines.push({
@@ -40,7 +28,10 @@ export function RMA(processesData , maxTime) {
 
 
 
-        
+        if (currentTime > maxTime) {
+            break ;
+        }
+
         if(currentProcess?.executionTime === 0 ) { 
             scheduledProcesses = scheduledProcesses.filter((process) => !(process.pid === currentProcess.pid && process.jobid === currentProcess.jobid))
             currentProcess = null 
@@ -73,8 +64,8 @@ export function RMA(processesData , maxTime) {
         })
 
 
-        let earlierPriorityProcess = scheduledProcesses.reduce((min, process) =>
-            process.periodicTime < min.periodicTime ? process : min, scheduledProcesses[0]);
+        let earlierDeadLineProcess = scheduledProcesses.reduce((min, process) =>
+            process.deadline < min.deadline ? process : min, scheduledProcesses[0]);
 
 
         let nextChange = processes.reduce((min, process) => {
@@ -95,16 +86,16 @@ export function RMA(processesData , maxTime) {
         }, processes[0])
 
 
-        if (!earlierPriorityProcess ) {
+        if (!earlierDeadLineProcess ) {
             currentTime += nextChange.time
             continue
             
         }else { 
-            currentProcess = earlierPriorityProcess
+            currentProcess = earlierDeadLineProcess
         }
 
         x = currentTime 
-        const nextStep =  Math.min((nextChange.periodicTime < currentProcess.periodicTime ? nextChange.time : earlierPriorityProcess.executionTime ) , earlierPriorityProcess.executionTime )
+        const nextStep =  Math.min((nextChange.deadline < currentProcess.deadline ? nextChange.time : earlierDeadLineProcess.executionTime ) , earlierDeadLineProcess.executionTime )
        
         currentTime += nextStep
 
@@ -115,9 +106,8 @@ export function RMA(processesData , maxTime) {
             exceededProcesses.push({
                 arrivalTime : x, 
                 burstTime :nextStep , 
-                taskid : currentProcess.pid ,
-                ...currentProcess ,
-                color:colorScale[currentProcess.pid]
+                pid : currentProcess.pid ,
+                ...currentProcess
                 
             })
             currentProcess.executionTime -= nextStep
@@ -129,3 +119,12 @@ export function RMA(processesData , maxTime) {
     return { processes: exceededProcesses , brokendeadline };
 
 }
+
+const processes = [
+    {taskid : 3 , releaseTime : 20 , periodicTime : 60 , executionTime : 15 , deadLine : 60},
+    {taskid : 2 , releaseTime : 15 , periodicTime : 60 , executionTime : 10 , deadLine : 40},
+    {taskid : 1 , releaseTime : 0 , periodicTime : 60 , executionTime : 25 , deadLine : 50},
+]
+
+const data = DMA(processes , 70)
+console.log(data)
