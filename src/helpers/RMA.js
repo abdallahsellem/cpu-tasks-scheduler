@@ -6,10 +6,10 @@ export function RMA(processesData , maxTime) {
 
     const processes = processesData.map((process, index) => ({
         pid: process.taskid,
-        releaseTime: process.releaseTime,
+        releaseTime:0,
         periodicTime: process.period,
         executionTime: process.executionTime,
-        deadline: process.deadLine       
+        deadline: process.period       
     }));
 
     let currentTime = 0;
