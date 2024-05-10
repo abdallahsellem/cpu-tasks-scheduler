@@ -3,7 +3,6 @@ import './Process.css'; // Import CSS file for styling and animation
 
 const Process = ({ pid, arrivalTime, burstTime, color,parWidth,jobid }) => {
   const barWidth = 91; // Width of each time unit on the chart
-  console.log(arrivalTime,burstTime,parWidth)
   const style = {
     backgroundColor: color,
     borderRadius: '5px',
@@ -13,8 +12,8 @@ const Process = ({ pid, arrivalTime, burstTime, color,parWidth,jobid }) => {
     lineHeight: '30px',
     position: 'absolute',
     textAlign: 'center',
-    width: `${burstTime * parWidth}px`, // Adjust width based on burst time
-    left: `${arrivalTime * parWidth}px`, // Adjust position based on arrival time
+    width: `${arrivalTime * parWidth}px`, // Adjust width based on burst time
+    left: `${burstTime * parWidth}px`, // Adjust position based on arrival time
     top: `${pid * 40}px`, // Adjust position based on process ID
   };
 
