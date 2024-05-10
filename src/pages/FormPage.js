@@ -17,7 +17,7 @@ import { schedulePeriodicEDF } from '../helpers/EDF'; // Adjust the path if nece
 
 
 function FormPage() {
-    const { setMaxTime, setTracks } = useMyContext();
+    const { setMaxTime, setTracks,setDeadLine } = useMyContext();
     const [algorithmType, setAlgorithmType] = React.useState('');
     const [numberOfTasks, setNumberOfTasks] = React.useState(1);
     const [tasksData, setTasksData] = React.useState({ maxTime: 0, data: [{ taskid: -1, releaseTime: 0, period: 0, executionTime: 0, deadLine: 0, priority: 0 }] });
@@ -79,6 +79,7 @@ function FormPage() {
         console.log(orderedTasks)
         setTracks(orderedTasks.processes);
         setMaxTime(tasksData.maxTime)
+        setDeadLine(orderedTasks.brokendeadline)
         navigate("/visualization-page")
 
     };
