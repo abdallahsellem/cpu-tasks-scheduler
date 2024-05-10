@@ -10,12 +10,10 @@ const ChartScheduling = ( ) => {
     if (processContainerRef.current) {
       // Accessing clientWidth of the div
       setProcessParWidthWidth(processContainerRef.current.getBoundingClientRect().width);
-      console.log(processContainerRef.current.getBoundingClientRect().width,maxTime)
     }
   }, [processContainerRef]);
   return (
 <div className="scheduler-container">
-  <>{console.log(tasks,maxTime)}</>
       <div className="timeline-container">
         {[...Array(maxTime + 1).keys()].map((time) => (
           <div key={time} className="timeline" ref={processContainerRef}>
@@ -33,7 +31,7 @@ const ChartScheduling = ( ) => {
             arrivalTime={process.arrivalTime}
             burstTime={process.burstTime}
             color={process.color}
-            jobid={process.jopid}
+            jobid={process.jobid}
             parWidth={processParWidth}
           /></>
           

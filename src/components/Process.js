@@ -16,11 +16,12 @@ const Process = ({ pid, arrivalTime, burstTime, color,parWidth,jobid }) => {
     width: `${burstTime * parWidth}px`, // Adjust width based on burst time
     left: `${arrivalTime * parWidth}px`, // Adjust position based on arrival time
     top: `${pid * 40}px`, // Adjust position based on process ID
+    fontSize: "85%"
   };
 
   return (
     <div className="process" style={style}>
-      P{pid+1}{jobid+1}
+      P{pid+1}{jobid}
     </div>
   );
 };

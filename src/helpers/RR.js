@@ -23,11 +23,7 @@ function scheduleJobs(tasksData, maxTime, timeQuantum) {
         allJobs = tasksData;
     }
     allJobs.sort((a, b) => a.releaseTime - b.releaseTime);
-    console.log("*********************************************")
-    for (const joby of allJobs) {
-        console.log(joby)
-    }
-    console.log("*********************************************")
+
 
     let scheduledJobs = [];
     let currTime = 0;
@@ -35,9 +31,8 @@ function scheduleJobs(tasksData, maxTime, timeQuantum) {
     while (currTime <= maxTime && (allJobs.length > 0||jobsQueue.length>0)) {
         for (let i = 0; i < allJobs.length; i++) {
             if (currTime > allJobs[i].deadLine && Object.keys(brokenDeadLine).length === 0) {
-                brokenDeadLine = { taskid: allJobs[i].taskid, jopid: allJobs[i].jobid, time: currTime }
+                brokenDeadLine = { taskid: allJobs[i].taskid, jobid: allJobs[i].jobid, time: currTime }
             }
-            console.log(allJobs[i], currTime)
             if (allJobs[i].releaseTime <= currTime) {
                 jobsQueue.push(allJobs[i]);
                 allJobs.splice(i, 1);
@@ -46,13 +41,7 @@ function scheduleJobs(tasksData, maxTime, timeQuantum) {
 
         }
 
-        console.log("*********************************************")
-        console.log(currTime)
-        for (const joby of jobsQueue) {
-            console.log(joby)
-        }
-        console.log("*********************************************")
-
+      
         let currJob = jobsQueue.shift();
         if (currJob === undefined) {
             currTime++;
@@ -61,9 +50,9 @@ function scheduleJobs(tasksData, maxTime, timeQuantum) {
         let jobExecution = Math.min(timeQuantum, currJob.executionTime);
         currJob.executionTime -= jobExecution;
         if (currTime + jobExecution > currJob.deadLine && Object.keys(brokenDeadLine).length === 0) {
-            brokenDeadLine = { taskid: currJob.taskid, jopid: currJob.jobid, time: currTime }
+            brokenDeadLine = { taskid: currJob.taskid, jobid: currJob.jobid, time: currTime }
         }
-        scheduledJobs.push({ taskid: currJob.taskid, jopid: currJob.jobid, arrivalTime: currTime, burstTime: jobExecution, color: currJob.color });
+        scheduledJobs.push({ taskid: currJob.taskid, jobid: currJob.jobid, arrivalTime: currTime, burstTime: jobExecution, color: currJob.color });
         currTime += jobExecution;
 
 
@@ -80,23 +69,15 @@ function scheduleJobs(tasksData, maxTime, timeQuantum) {
         if (currJob.executionTime > 0) {
             jobsQueue.push(currJob);
         }
-        console.log(currJob)
-        console.log("????????????????????????????????????")
-        console.log(currTime)
-        for (const joby of jobsQueue) {
-            console.log(joby)
-        }
-        console.log("???????????????????????????????????//")
+      
 
     }
-    console.log(scheduledJobs, brokenDeadLine)
     return { processes: scheduledJobs, brokendeadline: brokenDeadLine };
 
 }
 
 export function schedulePeriodicRR(tasksData, maxTime, timeQuantum) {
 
-    console.log(tasksData, maxTime)
     const scheduledJobs = scheduleJobs(tasksData, maxTime, timeQuantum);
     return scheduledJobs;
 }

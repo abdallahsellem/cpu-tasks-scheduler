@@ -9,31 +9,49 @@ import Button from '@mui/material/Button';
 import { useMyContext } from "../context/TasksData"
 import { useNavigate } from "react-router-dom";
 import { FIFO } from '../helpers/FCFS'; // Adjust the path if necessary
-import { schedulePeriodicRMA } from '../helpers/RMA'; // Adjust the path if necessary
 import { schedulePeriodicRR } from '../helpers/RR'; // Adjust the path if necessary
-import { runMinimumLaxity } from '../helpers/MLT'; // Adjust the path if necessary
-import { schedulePeriodicDMA } from '../helpers/DMA'; // Adjust the path if 
-import { schedulePeriodicEDF } from '../helpers/EDF'; // Adjust the path if necessary
+import { RMA } from '../helpers/RMA'; 
+import { DMA } from '../helpers/DMA'; 
+import { runMinimumLaxity } from '../helpers/MLT';
+import { schedulePeriodicEDF } from '../helpers/EDF';
 
 
 function FormPage() {
     const { setMaxTime, setTracks,setDeadLine } = useMyContext();
     const [algorithmType, setAlgorithmType] = React.useState('');
     const [numberOfTasks, setNumberOfTasks] = React.useState(1);
+    const [isDisabled, setIsDisabled] = React.useState(false);
+    const [isDisabledQuantum, setIsDisabledQuantum] = React.useState(true);
+    const [quantumTime, setQuantumTime] = React.useState(1);
+
     const [tasksData, setTasksData] = React.useState({ maxTime: 0, data: [{ taskid: -1, releaseTime: 0, period: 0, executionTime: 0, deadLine: 0, priority: 0 }] });
     const navigate = useNavigate();
 
     const handleChangeSelect = (event) => {
         setAlgorithmType(event.target.value);
+        if(event.target.value==="MLT"||event.target.value==="RMA")
+            {
+                setIsDisabled(true) ;
+            }
+            else{
+                setIsDisabled(false) ;
+            }
+
+            if(event.target.value==="RR"||event.target.value==="EDF")
+                {
+                    setIsDisabledQuantum(false) ;
+                }
+                else{
+                    setIsDisabledQuantum(true) ;
+                }
+            
     };
     const handleChangeTasks = (event) => {
-        console.log(event.target.value)
         setNumberOfTasks(event.target.value);
     };
     const handleChangeTasksInfo = (index, value, field) => {
         // Create a copy of tasksData
         const updatedTasksData = [...tasksData.data];
-        console.log(updatedTasksData)
 
 
         // Update the specific task's field
@@ -54,35 +72,36 @@ function FormPage() {
         setTasksData(updatedTasksData);
 
     };
-
+    
+    const handleQuantumTime = (value) => {
+        setQuantumTime(Number(value))
+    }
     const handleTasksOrder = () => {
         if(algorithmType==="")
             {
                 return  ;
             }
-        console.log(tasksData.data)
         let orderedTasks=[];
         if (algorithmType === "FCFS") {
             orderedTasks=FIFO(tasksData.data,tasksData.maxTime)
         }
         else if (algorithmType === "RR") {
-            console.log("abdallaj")
-            orderedTasks= schedulePeriodicRR(tasksData.data,tasksData.maxTime,.25)
+            orderedTasks= schedulePeriodicRR(tasksData.data,tasksData.maxTime,quantumTime)
         }
         else if (algorithmType === "MLT") {
             orderedTasks=runMinimumLaxity(tasksData.data,tasksData.maxTime)
         }
         else if (algorithmType === "DMA") {
+            orderedTasks=DMA(tasksData.data,tasksData.maxTime)
 
         }
         else if (algorithmType === "RMA") {
-            
+            orderedTasks=RMA(tasksData.data,tasksData.maxTime)
         }
         else if (algorithmType === "EDF") {
-            orderedTasks=schedulePeriodicEDF(tasksData.data,tasksData.maxTime);
+            orderedTasks=schedulePeriodicEDF(tasksData.data,tasksData.maxTime,quantumTime);
         }
-        console.log(orderedTasks)
-        setTracks(orderedTasks.processes);
+        setTracks(orderedTasks?orderedTasks.processes:[]);
         setMaxTime(tasksData.maxTime)
         setDeadLine(orderedTasks.brokendeadline)
         navigate("/visualization-page")
@@ -127,6 +146,8 @@ function FormPage() {
                         return <div key={index}>
                             <TextField
                                 required
+                                disabled={isDisabled}
+
                                 id="Release Time"
                                 label="Release Time"
                                 defaultValue={0}
@@ -152,20 +173,14 @@ function FormPage() {
                             />
                             <TextField
                                 required
+                                disabled={isDisabled}
                                 id="Deadline"
                                 label="Deadline"
                                 defaultValue={0}
                                 type='number'
                                 onChange={e => handleChangeTasksInfo(index, e.target.value, "deadLine")}
                             />
-                            <TextField
-                                required
-                                id="Priority"
-                                label="Priority"
-                                defaultValue={0}
-                                type='number'
-                                onChange={e => handleChangeTasksInfo(index, e.target.value, "priority")}
-                            />
+            
                         </div>
                     })
                 }
@@ -177,7 +192,16 @@ function FormPage() {
                 defaultValue={0}
                 type='number'
                 onChange={e => handleMaxTime(e.target.value)}
-            /></div>
+            />{isDisabledQuantum===false?<TextField
+            required
+            disabled={isDisabledQuantum}
+            id="Quantum Time"
+            label="Quantum Time"
+            defaultValue={quantumTime}
+            type='number'
+            onChange={e => handleQuantumTime(e.target.value)}
+        />:<></>}
+        </div>
             <div style={{ marginTop: "20px" }}><Button variant="contained" sx={{ width: "150px", backgroundColor: "red" }} onClick={handleTasksOrder}>Visualize </Button></div>
         </div>
     )

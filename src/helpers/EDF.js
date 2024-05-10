@@ -1,7 +1,7 @@
 
 import chroma from 'chroma-js'; // Import chroma-js for color manipulation
 import { schedulePeriodicRR } from './RR';
-function scheduleJobs(tasksData, maxTime) {
+function scheduleJobs(tasksData, maxTime,quantumTime) {
 
     //
     // in this algorithm we are using only execution time and Period 
@@ -12,15 +12,12 @@ function scheduleJobs(tasksData, maxTime) {
     let scheduledJobs = []
 
     let taskIndex = 0;
-    console.log(maxTime)
     //Generate all Jobs for all Tasks and sort them based on release time :
     for (const task of tasksData) {
         let currTime = 0;
         let currDeadLine = task.period;
         let jobsCounter = 1;
-        console.log(task)
         while (currTime <= maxTime) {
-            console.log(currTime)
 
             allJobs.push({ taskid: task.taskid, jobid: jobsCounter, releaseTime: currTime, executionTime: task.executionTime, deadLine: currDeadLine, color: colorScale[taskIndex] })
             currTime += task.period;
@@ -30,14 +27,12 @@ function scheduleJobs(tasksData, maxTime) {
         taskIndex++;
     }
     allJobs.sort((a, b) => a.releaseTime - b.releaseTime);
-    console.log(allJobs[0], allJobs[1])
     let currTime = 0;
     let currJob = {};
     let brokenDeadLine = {}
     // 5 8 1 10
     // 5 8 2 10 
     while (currTime < maxTime && allJobs.length > 0) {
-        console.log(currTime, allJobs.length)
         let minimum_deadline = 10000000;
         let minimum_deadline_job = {};
         let jobsWithSamePriority = []
@@ -50,10 +45,9 @@ function scheduleJobs(tasksData, maxTime) {
             }
 
             if (job.deadLine < currTime&&Object.keys(brokenDeadLine).length === 0) {
-                brokenDeadLine = { taskid: job.taskid, jopid: job.jobid, time: currTime }
+                brokenDeadLine = { taskid: job.taskid, jobid: job.jobid, time: currTime }
             }
         }
-        console.log("leeeeeeh",jobsWithSamePriority)
         //check if there are many jobs with the same priority at current Time 
         for (const job of allJobs) {
             if (job.deadLine == minimum_deadline && job.releaseTime <= currTime) {
@@ -65,21 +59,18 @@ function scheduleJobs(tasksData, maxTime) {
             currTime = allJobs[0].releaseTime;
             continue
         }
-        console.log("Mish Leeeeeeeh ",jobsWithSamePriority)
         //Lets apply Round Robin on all jobs with the same priority and erase them from the Queue  ;
         if (jobsWithSamePriority.length > 1) {
             let maxTimeTemp = jobsWithSamePriority[0].deadLine;
             for (const job of jobsWithSamePriority) {
               job.releaseTime=currTime  
             }
-            console.log(currTime)
-            let tempData = schedulePeriodicRR(jobsWithSamePriority,jobsWithSamePriority[0].deadLine, .25);
+            let tempData = schedulePeriodicRR(jobsWithSamePriority,jobsWithSamePriority[0].deadLine, quantumTime);
 
             for (const job of jobsWithSamePriority) {
                 const findIndex = allJobs.findIndex(a => a === job)
                 findIndex !== -1 && allJobs.splice(findIndex, 1)
             }
-            console.log("djjjjjjjjjjjjjjjjjjjjjjjjjjjjj",tempData)
             scheduledJobs = scheduledJobs.concat(tempData.processes)
             if(Object.keys(tempData.brokendeadline).length !== 0)
                 {
@@ -98,8 +89,7 @@ function scheduleJobs(tasksData, maxTime) {
         currJob = minimum_deadline_job;
         let currTimeNext = maxTime;
         if (allJobs.length == 0 && minimum_deadline != 10000000) {
-            console.log(currJob)
-            scheduledJobs.push({ taskid: currJob.taskid, jopid: currJob.jobid, arrivalTime: currTime, burstTime: currJob.executionTime, color: currJob.color });
+            scheduledJobs.push({ taskid: currJob.taskid, jobid: currJob.jobid, arrivalTime: currTime, burstTime: currJob.executionTime, color: currJob.color });
             break;
         }
 
@@ -113,11 +103,11 @@ function scheduleJobs(tasksData, maxTime) {
         executionTime -= currTimeNext - currTime;
 
         if (currJob.deadLine < currTime + currTimeNext - currTime) {
-            brokenDeadLine = { taskid: currJob.taskid, jopid: currJob.jobid, time: currTime }
+            brokenDeadLine = { taskid: currJob.taskid, jobid: currJob.jobid, time: currTime }
         }
 
 
-        scheduledJobs.push({ taskid: currJob.taskid, jopid: currJob.jobid, arrivalTime: currTime, burstTime: currTimeNext - currTime, color: currJob.color });
+        scheduledJobs.push({ taskid: currJob.taskid, jobid: currJob.jobid, arrivalTime: currTime, burstTime: currTimeNext - currTime, color: currJob.color });
         if (executionTime > 0) {
             currJob.executionTime = executionTime;
             allJobs.unshift(currJob);
@@ -127,10 +117,8 @@ function scheduleJobs(tasksData, maxTime) {
     return { processes: scheduledJobs, brokendeadline: brokenDeadLine };
 
 }
-export function schedulePeriodicEDF(tasksData, maxTime) {
-    console.log("said")
-    const scheduledJobs = scheduleJobs(tasksData, maxTime);
-    console.log(scheduledJobs)
+export function schedulePeriodicEDF(tasksData, maxTime,quantumTime) {
+    const scheduledJobs = scheduleJobs(tasksData, maxTime,quantumTime);
     return scheduledJobs;
 }
 

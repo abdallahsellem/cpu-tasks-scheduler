@@ -1,7 +1,6 @@
 import chroma from 'chroma-js'; // Import chroma-js for color manipulation
 
 export function FIFO(processes_data , max_time) {
-  console.log(processes_data)
   const deadLines = []
   const colorScale = chroma.scale(['#00FF00', '#FF0000']).mode('lab').colors(processes_data.length);
   const processes = []
@@ -37,10 +36,9 @@ export function FIFO(processes_data , max_time) {
 
       const processNumber = processes.filter(process => process.taskid === executedProcess.taskid ).length + 1
       const message = `deadLine exceeded from process T${executedProcess.taskid}${processNumber} at ${executedProcess.deadLine}`
-      console.log(message)
       deadLines.push({
         taskid: executedProcess.taskid ,
-        jopid : processNumber , 
+        jobid : processNumber , 
         time : executedProcess.deadLine
       })
     }
@@ -48,12 +46,12 @@ export function FIFO(processes_data , max_time) {
 
       // return [processes ,  executedProcess.taskid , processNumber, executedProcess.deadLine]
     // }else {
-      const processNumber = processes.filter(process => process.taskid === executedProcess.taskid ).length
+      const processNumber = processes.filter(process => process.taskid === executedProcess.taskid ).length + 1
       processes.push({
         taskid : executedProcess.taskid ,
         arrivalTime : i ,
         burstTime : executedProcess.executionTime ,
-        jopid:processNumber,
+        jobid:processNumber,
         color : colorScale[executedProcess.taskid]
       })
       i += executedProcess.executionTime - 1
